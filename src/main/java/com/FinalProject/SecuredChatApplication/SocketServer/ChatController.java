@@ -29,6 +29,7 @@ public class ChatController {
     	String decryptedMessage = new String(message); // decrypt with owner session key and initial vector
     	String encryptedMessage = new String(message); // encrypt with receiver session key and initial vector
     	
+    	// TODO: SQL THIS CHAT
     	
     	simpMessagingTemplate.convertAndSendToUser(username, "/queue/messages", encryptedMessage);
     	return "done";
