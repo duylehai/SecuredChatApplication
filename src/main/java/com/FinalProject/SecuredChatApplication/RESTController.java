@@ -1,4 +1,4 @@
-package com.FinalProject.SecuredChaApplication;
+package com.FinalProject.SecuredChatApplication;
 
 import java.lang.reflect.Type;
 import java.util.Map;

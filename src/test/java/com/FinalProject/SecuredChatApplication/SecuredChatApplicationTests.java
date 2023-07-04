@@ -1,10 +1,10 @@
-package com.FinalProject.SecuredChaApplication;
+package com.FinalProject.SecuredChatApplication;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SecuredChaApplicationTests {
+class SecuredChatApplicationTests {
 
 	@Test
 	void contextLoads() {

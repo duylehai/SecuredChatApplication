@@ -1,4 +1,4 @@
-package com.FinalProject.SecuredChaApplication.SocketServer;
+package com.FinalProject.SecuredChatApplication.SocketServer;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;

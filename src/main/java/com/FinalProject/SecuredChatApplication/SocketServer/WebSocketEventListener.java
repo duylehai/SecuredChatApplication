@@ -1,11 +1,4 @@
-package com.FinalProject.SecuredChaApplication.SocketServer;
-
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+package com.FinalProject.SecuredChatApplication.SocketServer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

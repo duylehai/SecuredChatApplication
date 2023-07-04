@@ -1,4 +1,4 @@
-package com.FinalProject.SecuredChaApplication.SocketServer;
+package com.FinalProject.SecuredChatApplication.SocketServer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
