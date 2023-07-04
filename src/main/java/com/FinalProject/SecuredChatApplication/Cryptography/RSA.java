@@ -60,7 +60,6 @@ public class RSA {
 		byte[] decryptedMessageBytes = decryptCipher.doFinal(input.getBytes());
 		String decryptedMessage = new String(decryptedMessageBytes, StandardCharsets.UTF_8);
 		
-		
 		return decryptedMessage;
 	}
 }
