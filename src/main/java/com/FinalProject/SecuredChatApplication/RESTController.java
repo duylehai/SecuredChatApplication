@@ -3,13 +3,17 @@ package com.FinalProject.SecuredChatApplication;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
 
+import com.FinalProject.SecuredChatApplication.JSONAdapter.JSONAdapter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 @RestController
 public class RESTController {
+	
+	private final String SUCCESS_CODE = "Sir yes Sir!";
 	
 	@GetMapping("/greeting")
 	public String greeting() {
@@ -21,7 +25,7 @@ public class RESTController {
 		return "public key"; 					// SQL this public key of authenticate server
 	}
 	
-	@GetMapping("/login/{username}")
+	@GetMapping("/login")
 	public String login(@RequestBody String requestData) {
 		
 		String privateKey = "private key"; 		// SQL this private key of authenticate server
@@ -29,9 +33,11 @@ public class RESTController {
 		// decrypt stuff me do this
 		String decryptedData = new String(requestData);
 		
-		Gson gson = new Gson();
-		Type type = new TypeToken<Map<String, String>>(){}.getType();
-		Map<String, String> myMap = gson.fromJson(decryptedData, type);
+		Map<String, String> myMap = JSONAdapter.deserialize(decryptedData);
+		
+		if (! myMap.containsKey("decryptCheck") || myMap.get("decryptCheck") != SUCCESS_CODE) {
+			return "Request failed!";
+		}
 		
 		String pw = myMap.get("password");
 		String EPW = "EPW"; 					// SQL this 
@@ -47,4 +53,22 @@ public class RESTController {
 		return "Login Failed!";
 	}
 	
+	@GetMapping("/register")
+	public String register(@RequestBody String requestData) {
+		String privateKey = "private key"; 		// SQL this private key of authenticate server
+		
+		// decrypt stuff me do this
+		String decryptedData = new String(requestData);
+		Map<String, String> myMap = JSONAdapter.deserialize(decryptedData);
+		
+		if (! myMap.containsKey("decryptCheck") || myMap.get("decryptCheck") != SUCCESS_CODE) {
+			return "Request failed!";
+		}
+		
+		String username = myMap.get("username");
+		String password = myMap.get("password");
+		password = new String("sir yes sir"); // encrypt this shit, store this to DB
+		
+		return "register success";
+	}
 }
