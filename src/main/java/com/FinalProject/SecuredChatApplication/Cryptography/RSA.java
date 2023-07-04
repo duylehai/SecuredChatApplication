@@ -9,6 +9,8 @@ import java.util.Base64;
 
 import javax.crypto.*;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import javafx.util.*;
 
 public class RSA {
@@ -18,19 +20,21 @@ public class RSA {
 		KeyPair pair = generator.generateKeyPair();
 		PrivateKey privateKey = pair.getPrivate();
 		PublicKey publicKey = pair.getPublic();
-		Pair<String,String> res = new Pair<>(new String(privateKey.getEncoded()), new String(publicKey.getEncoded()));
+		Pair<String,String> res = new Pair<>(Base64.getEncoder().encodeToString(privateKey.getEncoded()), Base64.getEncoder().encodeToString(publicKey.getEncoded()));
 		return res;
 	}
 	
 	private static PublicKey stringToPubKey(String keyString) throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
-		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(keyString.getBytes("utf-8")));
+		Security.addProvider(new BouncyCastleProvider());  
+		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(keyString));
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		PublicKey key = keyFactory.generatePublic(keySpec);
 		return key;
 	}
 	
 	private static PrivateKey stringToPrivateKey(String keyString) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
-		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyString.getBytes("tuf-8")));
+		Security.addProvider(new BouncyCastleProvider());  
+		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyString));
 		KeyFactory fact = KeyFactory.getInstance("RSA");
 		PrivateKey priv = fact.generatePrivate(keySpec);
 		
@@ -57,8 +61,8 @@ public class RSA {
 		Cipher decryptCipher = Cipher.getInstance("RSA");
 		decryptCipher.init(Cipher.DECRYPT_MODE, stringToPrivateKey(priv));
 		
-		byte[] decryptedMessageBytes = decryptCipher.doFinal(input.getBytes());
-		String decryptedMessage = new String(decryptedMessageBytes, StandardCharsets.UTF_8);
+		byte[] decryptedMessageBytes = decryptCipher.doFinal(Base64.getDecoder().decode(input));
+		String decryptedMessage = new String(decryptedMessageBytes);
 		
 		return decryptedMessage;
 	}
