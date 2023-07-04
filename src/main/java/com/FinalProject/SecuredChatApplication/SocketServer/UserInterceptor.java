@@ -27,6 +27,7 @@ public class UserInterceptor implements ChannelInterceptor {
  
                 if (name instanceof ArrayList) {
                     accessor.setUser(new User(((ArrayList<String>) name).get(0).toString()));
+                    WebSocketEventListener.activeUsers.addAll((ArrayList<String>) name);
                 }
             }
         }
