@@ -7,6 +7,7 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
 
 import com.FinalProject.SecuredChatApplication.JSONAdapter.JSONAdapter;
+import com.FinalProject.SecuredChatApplication.SocketServer.WebSocketEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -14,6 +15,13 @@ import com.google.gson.reflect.TypeToken;
 public class RESTController {
 	
 	private final String SUCCESS_CODE = "Sir yes Sir!";
+	
+	private boolean checkIdentity(String data) {
+		if (data == null || !data.equals(SUCCESS_CODE)) {
+				return false;
+		}
+		return true;
+	}
 	
 	@GetMapping("/greeting")
 	public String greeting() {
@@ -34,10 +42,7 @@ public class RESTController {
 		String decryptedData = new String(requestData);
 		
 		Map<String, String> myMap = JSONAdapter.deserialize(decryptedData);
-		
-		if (! myMap.containsKey("decryptCheck") || myMap.get("decryptCheck") != SUCCESS_CODE) {
-			return "Request failed!";
-		}
+	
 		
 		String pw = myMap.get("password");
 		String EPW = "EPW"; 					// SQL this 
@@ -56,19 +61,31 @@ public class RESTController {
 	@GetMapping("/register")
 	public String register(@RequestBody String requestData) {
 		String privateKey = "private key"; 		// SQL this private key of authenticate server
-		
-		// decrypt stuff me do this
+		// decrypt stuff me do this -- WITH PRIVATE KEY
 		String decryptedData = new String(requestData);
 		Map<String, String> myMap = JSONAdapter.deserialize(decryptedData);
 		
-		if (! myMap.containsKey("decryptCheck") || myMap.get("decryptCheck") != SUCCESS_CODE) {
-			return "Request failed!";
-		}
 		
 		String username = myMap.get("username");
 		String password = myMap.get("password");
 		password = new String("sir yes sir"); // encrypt this shit, store this to DB
 		
 		return "register success";
+	}
+	
+	@GetMapping("/isActive/{username}")
+	public String isActive(@PathVariable("username") String username, @RequestBody String requestData){
+		
+		String decryptedData = new String(requestData);
+		Map<String, String> myMap = JSONAdapter.deserialize(decryptedData);
+		String receivedSession = myMap.get("sessionKey");
+		
+		if (!receivedSession.equals("get session key from sql")) // SQL this
+			return "request failed";
+		
+		if (WebSocketEventListener.isActive(username)) {
+			return "true";
+		}
+		return "false";
 	}
 }
