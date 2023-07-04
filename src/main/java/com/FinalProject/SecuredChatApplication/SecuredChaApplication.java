@@ -1,4 +1,4 @@
-package com.FinalProject.SecuredChaApplication;
+package com.FinalProject.SecuredChatApplication;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.FinalProject.SecuredChaApplication.SocketServer.model;
+package com.FinalProject.SecuredChatApplication.SocketServer.model;
 
 import java.security.Principal;
 

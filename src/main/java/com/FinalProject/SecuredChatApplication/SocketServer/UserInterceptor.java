@@ -1,4 +1,4 @@
-package com.FinalProject.SecuredChaApplication.SocketServer;
+package com.FinalProject.SecuredChatApplication.SocketServer;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -11,7 +11,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 
-import com.FinalProject.SecuredChaApplication.SocketServer.model.User;
+import com.FinalProject.SecuredChatApplication.SocketServer.model.User;
  
 public class UserInterceptor implements ChannelInterceptor {
  
