@@ -1,9 +1,9 @@
 package com.FinalProject.SecuredChatApplication.Model;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import java.util.Date;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -11,29 +11,33 @@ import jakarta.persistence.Table;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String password;
+    private String username;
+    private String EPW;
+    private String sessionKey;
+    private String createdAt;
 
-    public void getId(Long id) {
-        this.id = id;
+    public User() {
+        this.createdAt = new Date().toString();
     }
 
-    public void getName(String name) {
-        this.name = name;
+    public User(String username, String EPW, String sessionKey) {
+        this.username = username;
+        this.EPW = EPW;
+        this.sessionKey = sessionKey;
+        this.createdAt = new Date().toString();
     }
 
-    public void getPassword(String password) {
-        this.password = password;
+    public Long getId() {
+        return this.id;
+    }
+    public String getEPW() {
+        return this.EPW;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setEPW(String EPW) {
+        this.EPW = EPW;
     }
 }
