@@ -28,14 +28,13 @@ public class RESTController {
 		return  "hello user! test api";
 	}
 	
-	@GetMapping("getPublicKey")
+	@GetMapping("/getPublicKey")
 	public String getPublicKey() {
 		return "public key"; 					// SQL this public key of authenticate server
 	}
 	
-	@GetMapping("/login")
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String login(@RequestBody String requestData) {
-		
 		String privateKey = "private key"; 		// SQL this private key of authenticate server
 		
 		// decrypt stuff me do this
