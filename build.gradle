@@ -28,8 +28,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket:2.1.4.RELEASE'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+	implementation 'mysql:mysql-connector-java:8.0.33'
+	implementation 'javax.persistence:javax.persistence-api:2.2'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// jbdc
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
