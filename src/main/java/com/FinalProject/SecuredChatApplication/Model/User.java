@@ -2,42 +2,42 @@ package com.FinalProject.SecuredChatApplication.Model;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = { "username" }))
 public class User {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String username;
-    private String EPW;
-    private String sessionKey;
-    private String createdAt;
+
+    private String encryptedDummy;
+    private String publicKey;
+    private String encryptedPrivateKey;
 
     public User() {
-        this.createdAt = new Date().toString();
     }
 
-    public User(String username, String EPW, String sessionKey) {
+    public User(String username, String encryptedDummy, String publicKey, String encryptedPrivateKey) {
         this.username = username;
-        this.EPW = EPW;
-        this.sessionKey = sessionKey;
-        this.createdAt = new Date().toString();
+        this.encryptedDummy = encryptedDummy;
+        this.publicKey = publicKey;
+        this.encryptedPrivateKey = encryptedPrivateKey;
     }
 
-    public Long getId() {
-        return this.id;
-    }
-    public String getEPW() {
-        return this.EPW;
+    public String getDummy() {
+        return this.encryptedDummy;
     }
 
-    public void setEPW(String EPW) {
-        this.EPW = EPW;
+    public String getEncryptedPrivateKey() {
+        return this.encryptedPrivateKey;
     }
 }

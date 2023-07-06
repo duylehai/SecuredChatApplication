@@ -8,6 +8,6 @@ import com.FinalProject.SecuredChatApplication.Model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query("SELECT u FROM User u WHERE u.username = ?1") // JPQL
+    @Query("SELECT u FROM User u WHERE u.username = ?1")
     User findByUsername(String username);
 }

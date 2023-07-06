@@ -16,23 +16,44 @@ public class UserService {
     }
 
     public void addUser(User user) {
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
-    public String getUserEPW(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            return "";
+    public void addUser(String username, String password) {
+        String sha = "test";
+
+        // public key
+        String publicKey = "public key";
+
+        // private key
+        String privateKey = "encrypted private key with sha(password)";
+
+        String dummy = "encrypted 'dummy' with sha(password)";
+
+        User user = new User(username, dummy, publicKey, privateKey);
+        
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        return user.getEPW();
     }
 
-    public void updateUserEPW(String username, String newEPW) {
+    // return null if invalid
+    // else return encrypted private key
+    public User isValidUser(String username, String password) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            return;
+            return null;
         }
-        user.setEPW(newEPW);
-        userRepository.save(user);
+        String sha = "test";
+        if (!user.getDummy().equals("encrypted 'dummy' with sha(password)")) {
+            return null;
+        }
+        return user;
     }
 }

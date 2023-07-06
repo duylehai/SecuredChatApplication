@@ -7,5 +7,4 @@ import com.FinalProject.SecuredChatApplication.Model.Conversation;
 
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
-    Conversation findByFirstUserIdAndSecondUserId(Long firstUserId, Long secondUserId);
 }

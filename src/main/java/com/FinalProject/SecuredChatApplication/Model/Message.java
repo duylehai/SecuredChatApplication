@@ -18,24 +18,12 @@ public class Message {
 
     @ManyToOne(targetEntity = Conversation.class)
     @JoinColumn(name = "conversation_id", referencedColumnName = "id")
-    private Long conversationId;
+    private Conversation conversation;
 
     @ManyToOne(targetEntity = User.class)
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
-    private Long senderId;
+    private User sender;
 
-    private String message;
-    
-    private String createdAt;
-
-    public Message() {
-        this.createdAt = new Date().toString();
-    }
-
-    public Message(Long conversationId, Long senderId, String message) {
-        this.conversationId = conversationId;
-        this.senderId = senderId;
-        this.message = message;
-        this.createdAt = new Date().toString();
-    }
+    private String encryptedMessage;
+    private String encryptedSecretKey;
 }

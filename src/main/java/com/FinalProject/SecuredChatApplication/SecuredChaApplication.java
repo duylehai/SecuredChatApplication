@@ -31,19 +31,12 @@ public class SecuredChaApplication {
 		// ConversationService conversationService = context.getBean(ConversationService.class);
 		// MessageService messageService = context.getBean(MessageService.class, conversationService);
 		// Add a new user
-		User user = new User("meow", "meow1", "meow2");
+		
+		userService.addUser("hungt1", "1234");
 
-		userService.addUser(user);
+		System.out.println(userService.isValidUser("hungt1", "1234"));
 
-		User user2 = new User("hungt1", "test", "test1");
-
-		userService.addUser(user2);
-		// UserService userService = context.getBean(UserService.class);
-		// userService.addUser(user);
-
-		userService.updateUserEPW("hungt1", "test2");
-		System.out.println(userService.getUserEPW("hungt1"));
-
+		System.out.println(userService.isValidUser("hungt2", "1234"));
 	
 	}
 }

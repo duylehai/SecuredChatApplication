@@ -14,27 +14,19 @@ public class Conversation {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "first_user_id", referencedColumnName = "id")
-    private User firstUser;
+    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name = "user_a_id", referencedColumnName = "id")
+    private User userA;
 
-    @ManyToOne
-    @JoinColumn(name = "second_user_id", referencedColumnName = "id")
-    private User secondUser;
+    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name = "user_b_id", referencedColumnName = "id")
+    private User userB;
 
-    private String createdAt;
-    
     public Conversation() {
-        this.createdAt = new java.util.Date().toString();
     }
 
-    public Conversation(User firstUser, User secondUser) {
-        this.firstUser = firstUser;
-        this.secondUser = secondUser;
-        this.createdAt = new java.util.Date().toString();
-    }
-
-    public Long getId() {
-        return this.id;
+    public Conversation(User userA, User userB) {
+        this.userA = userA;
+        this.userB = userB;
     }
 }
