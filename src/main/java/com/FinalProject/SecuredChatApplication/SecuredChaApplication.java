@@ -15,6 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import com.FinalProject.SecuredChatApplication.Model.Message;
+import com.FinalProject.SecuredChatApplication.Service.MessageService;
 import com.FinalProject.SecuredChatApplication.Service.UserService;
 
 @SpringBootApplication
@@ -27,6 +29,8 @@ public class SecuredChaApplication {
 //        app.run(args);
 		ApplicationContext context = SpringApplication.run(SecuredChaApplication.class, args);
 		UserService userService = context.getBean(UserService.class);
+		MessageService messageService = context.getBean(MessageService.class);
+
 		ContextProvider contextProvider = new ContextProvider();
 		contextProvider.setApplicationContext(context);
 		
@@ -34,7 +38,10 @@ public class SecuredChaApplication {
 		// MessageService messageService = context.getBean(MessageService.class, conversationService);
 		// Add a new user
 		
-//		userService.addUser("hungt1", "1234");
+		userService.addUser("hungt1", "1234");
+		userService.addUser("hungt2", "aaaa");
+
+		messageService.addMessage(1L, 2L, "meow meow", "hmmm");		
 
 //		System.out.println(userService.isValidUser("hungt1", "1234"));
 //

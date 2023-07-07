@@ -10,6 +10,5 @@ import com.FinalProject.SecuredChatApplication.Model.Message;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    // @Query("SELECT m FROM Message m WHERE m.conversationId = ?1 ORDER BY m.id DESC") // JPQL
-    // ArrayList<Message> findByConversationId(Long conversationId, Integer limit, Integer offset);
+
 }

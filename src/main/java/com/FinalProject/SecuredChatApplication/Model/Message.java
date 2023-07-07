@@ -24,4 +24,15 @@ public class Message {
 
     private String encryptedMessage;
     private String encryptedSecretKey;
+
+    public Message() {
+
+    }
+
+    public Message(Conversation conversation, User sender, String encryptedMessage, String encryptedSecretKey) {
+        this.conversation = conversation;
+        this.sender = sender;
+        this.encryptedMessage = encryptedMessage;
+        this.encryptedSecretKey = encryptedSecretKey;
+    }
 }

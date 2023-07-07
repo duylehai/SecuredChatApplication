@@ -50,7 +50,14 @@ public class User {
 	public String getIV() {
 		return IV;
 	}
+
+    public String getUsername() {
+        return this.username;
+    }
 	
+    public String getPublicKey() {
+        return this.publicKey;
+    }
     
     
 }
