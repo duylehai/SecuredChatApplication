@@ -1,7 +1,5 @@
 package com.FinalProject.SecuredChatApplication.Model;
 
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,15 +20,19 @@ public class User {
     private String encryptedDummy;
     private String publicKey;
     private String encryptedPrivateKey;
+    private String salt;
+    private String IV;
 
     public User() {
     }
 
-    public User(String username, String encryptedDummy, String publicKey, String encryptedPrivateKey) {
+    public User(String username, String encryptedDummy, String publicKey, String encryptedPrivateKey, String salt, String aesIVString) {
         this.username = username;
         this.encryptedDummy = encryptedDummy;
         this.publicKey = publicKey;
         this.encryptedPrivateKey = encryptedPrivateKey;
+        this.salt = salt;
+        this.IV = aesIVString;
     }
 
     public String getDummy() {
@@ -40,4 +42,15 @@ public class User {
     public String getEncryptedPrivateKey() {
         return this.encryptedPrivateKey;
     }
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public String getIV() {
+		return IV;
+	}
+	
+    
+    
 }
