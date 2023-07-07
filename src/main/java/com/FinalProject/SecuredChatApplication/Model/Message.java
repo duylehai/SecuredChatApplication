@@ -24,4 +24,6 @@ public class Message {
 
     private String encryptedMessage;
     private String encryptedSecretKey;
+    
+    // add boolean send to client ? for pull purpose
 }

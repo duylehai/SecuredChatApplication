@@ -3,6 +3,7 @@ package com.FinalProject.SecuredChatApplication.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.FinalProject.SecuredChatApplication.Model.Message;
 import com.FinalProject.SecuredChatApplication.Repository.MessageRepository;
 
 @Service
@@ -19,5 +20,9 @@ public class MessageService {
     // get L'th to R'th message 
     public String pullMessage(String sender, String receiver, int L, int R) {
     	return "";
+    }
+    
+    public void addNewMessage(Message msg) {
+    	
     }
 }
