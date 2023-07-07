@@ -90,6 +90,16 @@ public class RESTController {
 		}
 	}
 	
+	@GetMapping("/pullMessage/{target}")
+	public String pullMessage(@RequestBody final String requestData,@PathVariable("target") String receiver) {
+		Map<String, String> myMap = JSONAdapter.deserialize(requestData);
+		String sender = myMap.get("username");
+		// NOT IMPLEMENTED YET
+		String respond = "";
+		return "";
+	}
+	
+	
 	@GetMapping("/isActive/{username}")
 	public String isActive(@PathVariable("username") String username, @RequestBody String requestData){
 		

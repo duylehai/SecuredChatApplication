@@ -15,4 +15,9 @@ public class MessageService {
         this.messageRepository = messageRepository;
         this.conversationService = conversationService;
     }
+    
+    // get L'th to R'th message 
+    public String pullMessage(String sender, String receiver, int L, int R) {
+    	return "";
+    }
 }
