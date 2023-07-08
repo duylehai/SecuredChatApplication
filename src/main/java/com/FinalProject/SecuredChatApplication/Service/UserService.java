@@ -36,25 +36,25 @@ public class UserService {
         }
     }
 
-//    public void addUser(String username, String password) {
-//        String sha = "test";
-//
-//        // public key
-//        String publicKey = "public key";
-//
-//        // private key
-//        String privateKey = "encrypted private key with sha(password)";
-//
-//        String dummy = "encrypted 'dummy' with sha(password)";
-//
-//        User user = new User(username, dummy, publicKey, privateKey);
-//        
-//        try {
-//            userRepository.save(user);
-//        } catch (Exception e) {
-//            System.out.println("Error: " + e.getMessage());
-//        }
-//    }
+   public void addUser(String username, String password) {
+       String sha = "test";
+
+       // public key
+       String publicKey = "public key";
+
+       // private key
+       String privateKey = "encrypted private key with sha(password)";
+
+       String dummy = "encrypted 'dummy' with sha(password)";
+
+       User user = new User(username, dummy, publicKey, privateKey, "a", "a");
+       
+       try {
+           userRepository.save(user);
+       } catch (Exception e) {
+           System.out.println("Error: " + e.getMessage());
+       }
+   }
 
     // return null if invalid
     // else return encrypted private key
@@ -74,9 +74,12 @@ public class UserService {
         return user;
     }
     
-    // TODO implement this method
     public String getUserPublicKey(String username) {
-    	return "public key";
+    	return userRepository.findByUsername(username).getPublicKey();
+    }
+
+    public User getUserById(Long senderId) {
+        return userRepository.findById(senderId).get();
     }
     
 }
