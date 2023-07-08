@@ -31,6 +31,7 @@ import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
+import { RegisterDialog } from './RegisterDialog';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 
@@ -53,6 +54,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       prompts,
+      loggedIn,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -91,8 +93,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           field: 'selectedConversation',
           value: updatedConversation,
         });
-        homeDispatch({ field: 'loading', value: true });
-        homeDispatch({ field: 'messageIsStreaming', value: true });
+        // homeDispatch({ field: 'loading', value: true });
+        // homeDispatch({ field: 'messageIsStreaming', value: true });
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
@@ -122,19 +124,21 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           statusText: '',
         };
         if (!response.ok) {
-          homeDispatch({ field: 'loading', value: false });
+          // homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
           toast.error(response.statusText);
           return;
         }
         const data = response.body;
         if (!data) {
-          homeDispatch({ field: 'loading', value: false });
+          // homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
         // if (!plugin) {
+        // Upon connecting to another user to send message or something
         if (updatedConversation.messages.length === 1) {
+          alert('Test');
           const { content } = message;
           const customName =
             content.length > 30 ? content.substring(0, 30) + '...' : content;
@@ -143,94 +147,44 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             name: customName,
           };
         }
-        homeDispatch({ field: 'loading', value: false });
-        const decoder = new TextDecoder();
+        // homeDispatch({ field: 'loading', value: false });
 
-        let text = '';
-        const value = data;
-        const chunkValue = value;
-        text += chunkValue;
-        // if (isFirst) {
-        const updatedMessages: Message[] = [
-          ...updatedConversation.messages,
-          { role: 'assistant', content: chunkValue },
-        ];
-        updatedConversation = {
-          ...updatedConversation,
-          messages: updatedMessages,
-        };
-        homeDispatch({
-          field: 'selectedConversation',
-          value: updatedConversation,
-        });
-        // } else {
-        //   const updatedMessages: Message[] = updatedConversation.messages.map(
-        //     (message, index) => {
-        //       if (index === updatedConversation.messages.length - 1) {
-        //         return {
-        //           ...message,
-        //           content: text,
-        //         };
-        //       }
-        //       return message;
-        //     },
-        //   );
-        //   updatedConversation = {
-        //     ...updatedConversation,
-        //     messages: updatedMessages,
-        //   };
-        //   homeDispatch({
-        //     field: 'selectedConversation',
-        //     value: updatedConversation,
-        //   });
-        // }
+        // something should be handled upon receiving messages, don't know how yet.
+        if (Math.floor(Math.random() * 3) == 1) {
+          let text = '';
+          const value = data;
+          const chunkValue = value;
+          text += chunkValue;
 
-        saveConversation(updatedConversation);
-        const updatedConversations: Conversation[] = conversations.map(
-          (conversation) => {
-            if (conversation.id === selectedConversation.id) {
-              return updatedConversation;
-            }
-            return conversation;
-          },
-        );
-        if (updatedConversations.length === 0) {
-          updatedConversations.push(updatedConversation);
+          const updatedMessages: Message[] = [
+            ...updatedConversation.messages,
+            { role: 'assistant', content: chunkValue },
+          ];
+          updatedConversation = {
+            ...updatedConversation,
+            messages: updatedMessages,
+          };
+          homeDispatch({
+            field: 'selectedConversation',
+            value: updatedConversation,
+          });
+
+          saveConversation(updatedConversation);
+          const updatedConversations: Conversation[] = conversations.map(
+            (conversation) => {
+              if (conversation.id === selectedConversation.id) {
+                return updatedConversation;
+              }
+              return conversation;
+            },
+          );
+          if (updatedConversations.length === 0) {
+            updatedConversations.push(updatedConversation);
+          }
+          homeDispatch({ field: 'conversations', value: updatedConversations });
+          saveConversations(updatedConversations);
+          homeDispatch({ field: 'messageIsStreaming', value: false });
         }
-        homeDispatch({ field: 'conversations', value: updatedConversations });
-        saveConversations(updatedConversations);
-        homeDispatch({ field: 'messageIsStreaming', value: false });
-        // } else {
-        //   const { answer } = await response.json();
-        //   const updatedMessages: Message[] = [
-        //     ...updatedConversation.messages,
-        //     { role: 'assistant', content: answer },
-        //   ];
-        //   updatedConversation = {
-        //     ...updatedConversation,
-        //     messages: updatedMessages,
-        //   };
-        //   homeDispatch({
-        //     field: 'selectedConversation',
-        //     value: updateConversation,
-        //   });
-        //   saveConversation(updatedConversation);
-        //   const updatedConversations: Conversation[] = conversations.map(
-        //     (conversation) => {
-        //       if (conversation.id === selectedConversation.id) {
-        //         return updatedConversation;
-        //       }
-        //       return conversation;
-        //     },
-        //   );
-        //   if (updatedConversations.length === 0) {
-        //     updatedConversations.push(updatedConversation);
-        //   }
-        //   homeDispatch({ field: 'conversations', value: updatedConversations });
-        //   saveConversations(updatedConversations);
-        //   homeDispatch({ field: 'loading', value: false });
-        //   homeDispatch({ field: 'messageIsStreaming', value: false });
-        // }
       }
     },
     [
@@ -344,53 +298,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             ref={chatContainerRef}
             onScroll={handleScroll}
           >
-            {selectedConversation?.messages.length === 0 ? (
-              <>
-                <div className="mx-auto flex flex-col space-y-5 md:space-y-10 px-3 pt-5 md:pt-12 sm:max-w-[600px]">
-                  {/* <div className="text-center text-3xl font-semibold text-gray-800 dark:text-gray-100">
-                    {models.length === 0 ? (
-                      <div>
-                        <Spinner size="500px" className="mx-auto" />
-                      </div>
-                    ) : (
-                      'Chatbot UI'
-                    )}
-                  </div> */}
-
-                  {
-                    <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
-                      <ModelSelect />
-
-                      <SystemPrompt
-                        conversation={selectedConversation}
-                        prompts={prompts}
-                        onChangePrompt={(prompt) => {
-                          console.log('lma0');
-                        }}
-                        // onChangePrompt={(prompt) =>
-                        //   handleUpdateConversation(selectedConversation, {
-                        //     key: 'prompt',
-                        //     value: prompt,
-                        //   })
-                        // }
-                      />
-
-                      <TemperatureSlider
-                        label={t('Temperature')}
-                        onChangeTemperature={(temperature) => {
-                          console.log('Si3u hai huoc');
-                        }}
-                        // onChangeTemperature={(temperature) =>
-                        //   handleUpdateConversation(selectedConversation, {
-                        //     key: 'temperature',
-                        //     value: temperature,
-                        //   })
-                        // }
-                      />
-                    </div>
-                  }
-                </div>
-              </>
+            {!loggedIn ? (
+              <RegisterDialog />
             ) : (
               <>
                 {selectedConversation?.messages.map((message, index) => (
@@ -419,21 +328,23 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             )}
           </div>
 
-          <ChatInput
-            stopConversationRef={stopConversationRef}
-            textareaRef={textareaRef}
-            onSend={(message, plugin) => {
-              setCurrentMessage(message);
-              handleSend(message, 0, plugin);
-            }}
-            onScrollDownClick={handleScrollDown}
-            onRegenerate={() => {
-              if (currentMessage) {
-                handleSend(currentMessage, 2, null);
-              }
-            }}
-            showScrollDownButton={showScrollDownButton}
-          />
+          {loggedIn && (
+            <ChatInput
+              stopConversationRef={stopConversationRef}
+              textareaRef={textareaRef}
+              onSend={(message, plugin) => {
+                setCurrentMessage(message);
+                handleSend(message, 0, plugin);
+              }}
+              onScrollDownClick={handleScrollDown}
+              onRegenerate={() => {
+                if (currentMessage) {
+                  handleSend(currentMessage, 2, null);
+                }
+              }}
+              showScrollDownButton={showScrollDownButton}
+            />
+          )}
         </>
       }
     </div>

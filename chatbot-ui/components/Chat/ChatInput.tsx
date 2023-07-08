@@ -55,7 +55,7 @@ export const ChatInput = ({
 
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [showPromptList, setShowPromptList] = useState(false);
+  // const [showPromptList, setShowPromptList] = useState(false);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
@@ -133,36 +133,37 @@ export const ChatInput = ({
       });
       handlePromptSelect(selectedPrompt);
     }
-    setShowPromptList(false);
+    // setShowPromptList(false);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (showPromptList) {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setActivePromptIndex((prevIndex) =>
-          prevIndex < prompts.length - 1 ? prevIndex + 1 : prevIndex,
-        );
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setActivePromptIndex((prevIndex) =>
-          prevIndex > 0 ? prevIndex - 1 : prevIndex,
-        );
-      } else if (e.key === 'Tab') {
-        e.preventDefault();
-        setActivePromptIndex((prevIndex) =>
-          prevIndex < prompts.length - 1 ? prevIndex + 1 : 0,
-        );
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        handleInitModal();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        setShowPromptList(false);
-      } else {
-        setActivePromptIndex(0);
-      }
-    } else if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
+    // if (showPromptList) {
+    //   if (e.key === 'ArrowDown') {
+    //     e.preventDefault();
+    //     setActivePromptIndex((prevIndex) =>
+    //       prevIndex < prompts.length - 1 ? prevIndex + 1 : prevIndex,
+    //     );
+    //   } else if (e.key === 'ArrowUp') {
+    //     e.preventDefault();
+    //     setActivePromptIndex((prevIndex) =>
+    //       prevIndex > 0 ? prevIndex - 1 : prevIndex,
+    //     );
+    //   } else if (e.key === 'Tab') {
+    //     e.preventDefault();
+    //     setActivePromptIndex((prevIndex) =>
+    //       prevIndex < prompts.length - 1 ? prevIndex + 1 : 0,
+    //     );
+    //   } else if (e.key === 'Enter') {
+    //     e.preventDefault();
+    //     handleInitModal();
+    //   } else if (e.key === 'Escape') {
+    //     e.preventDefault();
+    //     setShowPromptList(false);
+    //   } else {
+    //     setActivePromptIndex(0);
+    //   }
+    // } else
+    if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     } else if (e.key === '/' && e.metaKey) {
@@ -187,10 +188,10 @@ export const ChatInput = ({
     const match = text.match(/\/\w*$/);
 
     if (match) {
-      setShowPromptList(true);
+      // setShowPromptList(true);
       setPromptInputValue(match[0].slice(1));
     } else {
-      setShowPromptList(false);
+      // setShowPromptList(false);
       setPromptInputValue('');
     }
   }, []);
@@ -239,22 +240,22 @@ export const ChatInput = ({
     }
   }, [content]);
 
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (
-        promptListRef.current &&
-        !promptListRef.current.contains(e.target as Node)
-      ) {
-        setShowPromptList(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleOutsideClick = (e: MouseEvent) => {
+  //     if (
+  //       promptListRef.current &&
+  //       !promptListRef.current.contains(e.target as Node)
+  //     ) {
+  //       setShowPromptList(false);
+  //     }
+  //   };
 
-    window.addEventListener('click', handleOutsideClick);
+  //   window.addEventListener('click', handleOutsideClick);
 
-    return () => {
-      window.removeEventListener('click', handleOutsideClick);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener('click', handleOutsideClick);
+  //   };
+  // }, []);
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
@@ -268,7 +269,7 @@ export const ChatInput = ({
           </button>
         )}
 
-        {!messageIsStreaming &&
+        {/* {!messageIsStreaming &&
           selectedConversation &&
           selectedConversation.messages.length > 0 && (
             <button
@@ -277,7 +278,7 @@ export const ChatInput = ({
             >
               <IconRepeat size={16} /> {t('Regenerate response')}
             </button>
-          )}
+          )} */}
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
           <button
@@ -324,9 +325,7 @@ export const ChatInput = ({
                   : 'hidden'
               }`,
             }}
-            placeholder={
-              t('Type a message or type "/" to select a prompt...') || ''
-            }
+            placeholder={t('Type a message') || ''}
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}
@@ -357,7 +356,7 @@ export const ChatInput = ({
             </div>
           )}
 
-          {showPromptList && filteredPrompts.length > 0 && (
+          {/* {showPromptList && filteredPrompts.length > 0 && (
             <div className="absolute bottom-12 w-full">
               <PromptList
                 activePromptIndex={activePromptIndex}
@@ -367,7 +366,7 @@ export const ChatInput = ({
                 promptListRef={promptListRef}
               />
             </div>
-          )}
+          )} */}
 
           {isModalVisible && (
             <VariableModal

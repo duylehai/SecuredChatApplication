@@ -1,4 +1,9 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import {
+  IconFileExport,
+  IconKey,
+  IconLogout,
+  IconSettings,
+} from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -25,6 +30,7 @@ export const ChatbarSettings = () => {
       serverSideApiKeyIsSet,
       serverSidePluginKeysSet,
       conversations,
+      loggedIn,
     },
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -42,19 +48,30 @@ export const ChatbarSettings = () => {
         <ClearConversations onClearConversations={handleClearConversations} />
       ) : null}
 
-      <Import onImport={handleImportConversations} />
+      {/* <Import onImport={handleImportConversations} />
 
       <SidebarButton
         text={t('Export data')}
         icon={<IconFileExport size={18} />}
         onClick={() => handleExportData()}
-      />
+      /> */}
 
-      <SidebarButton
-        text={t('Settings')}
-        icon={<IconSettings size={18} />}
-        onClick={() => setIsSettingDialog(true)}
-      />
+      {!loggedIn ? (
+        <SidebarButton
+          text={t('Login')}
+          icon={<IconKey size={18} />}
+          onClick={() => setIsSettingDialog(true)}
+        />
+      ) : (
+        <SidebarButton
+          text={t('Logout')}
+          icon={<IconLogout size={18} />}
+          onClick={() => {
+            homeDispatch({ field: 'loggedIn', value: false });
+            handleClearConversations();
+          }}
+        />
+      )}
 
       {/* {!serverSideApiKeyIsSet ? (
         <Key apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />

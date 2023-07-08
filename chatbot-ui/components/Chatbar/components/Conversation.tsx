@@ -155,9 +155,9 @@ export const ConversationComponent = ({ conversation }: Props) => {
         !isDeleting &&
         !isRenaming && (
           <div className="absolute right-1 z-10 flex text-gray-300">
-            <SidebarActionButton handleClick={handleOpenRenameModal}>
+            {/* <SidebarActionButton handleClick={handleOpenRenameModal}>
               <IconPencil size={18} />
-            </SidebarActionButton>
+            </SidebarActionButton> */}
             <SidebarActionButton handleClick={handleOpenDeleteModal}>
               <IconTrash size={18} />
             </SidebarActionButton>
