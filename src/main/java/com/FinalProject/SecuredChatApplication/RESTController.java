@@ -2,15 +2,18 @@ package com.FinalProject.SecuredChatApplication;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +23,7 @@ import com.FinalProject.SecuredChatApplication.Cryptography.AES;
 import com.FinalProject.SecuredChatApplication.Cryptography.RSA;
 import com.FinalProject.SecuredChatApplication.JSONAdapter.JSONAdapter;
 import com.FinalProject.SecuredChatApplication.Model.User;
+import com.FinalProject.SecuredChatApplication.Model.UserResponse;
 import com.FinalProject.SecuredChatApplication.Service.UserService;
 import com.FinalProject.SecuredChatApplication.SocketServer.WebSocketEventListener;
 
@@ -39,32 +43,37 @@ public class RESTController {
 		return userService.getUserPublicKey(username);
 	}
 	
+	@CrossOrigin
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String login(@RequestBody String requestData) { 
+	public ResponseEntity<UserResponse> login(@RequestBody String requestData) {
 		Map<String, String> myMap = JSONAdapter.deserialize(requestData);
 		String pw = myMap.get("password");
 		String username = myMap.get("username");
 		
+		// System.out.println("wtf");
 		try {	
 			User user = userService.isValidUser(username, pw);
-			
+		
 			if (user == null)
-				return "Login Failed!";
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+			System.out.println("C: wtf");
+
+			String privateKey = AES.decrypt(user.getEncryptedPrivateKey(), AES.getKeyFromPassword(pw, user.getSalt()), new IvParameterSpec(Base64.getDecoder().decode(user.getIV())));
+
+			UserResponse res = new UserResponse(username, privateKey);
 			
-			Map<String, String> respond = new HashMap<>();
-			respond.put("private key", user.getEncryptedPrivateKey());
-			respond.put("salt", user.getSalt());
-			respond.put("IV", user.getIV());
-			
-			// NOTE: serialize method is NOT IMPLEMETED.
-			return JSONAdapter.serialize(respond);
+			System.out.println("D: wtf");
+
+			return ResponseEntity.ok(res);
+
 		} catch (Exception e) {
-			e.printStackTrace();
-			return "login failed";
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@GetMapping("/register")
+	@CrossOrigin
+	@PostMapping("/register")
 	public String register(@RequestBody String requestData) {
 		Map<String, String> myMap = JSONAdapter.deserialize(requestData);
 		String username = myMap.get("username");
@@ -81,6 +90,7 @@ public class RESTController {
 			String aesIVString = Base64.getEncoder().encodeToString(aesIv.getIV());
 			User user = new User(username, encryptedDummy, keyPair.getValue(), encryptedPrivateKey, salt, aesIVString);
 			
+			System.out.println(username + '\n' + encryptedDummy + '\n' + keyPair.getValue() + '\n' + encryptedPrivateKey + '\n' + salt + '\n' + aesIVString);
 			userService.addUser(user);
 			
 			return "register success";

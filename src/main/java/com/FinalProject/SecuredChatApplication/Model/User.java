@@ -18,8 +18,13 @@ public class User {
     private String username;
 
     private String encryptedDummy;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String publicKey;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String encryptedPrivateKey;
+
     private String salt;
     private String IV;
 
@@ -59,5 +64,7 @@ public class User {
         return this.publicKey;
     }
     
-    
+    public Long getId() {
+        return this.id;
+    }
 }
