@@ -81,5 +81,9 @@ public class UserService {
     public User getUserById(Long senderId) {
         return userRepository.findById(senderId).get();
     }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
     
 }

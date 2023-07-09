@@ -38,10 +38,10 @@ public class SecuredChaApplication {
 		// MessageService messageService = context.getBean(MessageService.class, conversationService);
 		// Add a new user
 		
-		userService.addUser("hungt1", "1234");
-		userService.addUser("hungt2", "aaaa");
+		// userService.addUser("hungt1", "1234");
+		// userService.addUser("hungt2", "aaaa");
 
-		messageService.addMessage(1L, 2L, "meow meow", "hmmm");		
+		// messageService.addMessage(1L, 2L, "meow meow", "hmmm");		
 
 //		System.out.println(userService.isValidUser("hungt1", "1234"));
 //

@@ -34,4 +34,20 @@ public class MessageService {
 
         messageRepository.save(newMessage);
     }
+
+    public void addMessage(String usernameSender, String usernameReceiver, String message, String encryptedSecretKey) {
+        User sender = userService.getUserByUsername(usernameSender);
+        User receiver = userService.getUserByUsername(usernameReceiver);
+
+        if (!conversationService.conversationExist(sender.getId(), receiver.getId())) {
+            System.out.println("Conversation doesn't exist");
+            conversationService.addConversation(sender.getId(), receiver.getId());
+        } 
+
+        Conversation currentConversation = conversationService.getConversation(sender.getId(), receiver.getId());
+
+        Message newMessage = new Message(currentConversation, sender, message, encryptedSecretKey);
+
+        messageRepository.save(newMessage);
+    }
 }
