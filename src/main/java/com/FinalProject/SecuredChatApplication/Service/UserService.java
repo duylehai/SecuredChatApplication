@@ -68,8 +68,6 @@ public class UserService {
         SecretKey aesKey = AES.getKeyFromPassword(password, user.getSalt());
         String dummy = AES.decrypt(user.getDummy(), aesKey , iv);
         
-        System.out.println("A: " + user.getDummy());
-        System.out.println("B: " + dummy);
         if (!dummy.equals("dummy dummy dummy")) {
             return null;
         }

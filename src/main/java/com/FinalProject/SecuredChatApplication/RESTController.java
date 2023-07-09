@@ -38,7 +38,8 @@ public class RESTController {
 		return  "hello user! test api";
 	}
 	
-	@GetMapping("/getUserPublicKey/{username}")
+	@CrossOrigin
+	@GetMapping("/public-key/{username}")
 	public String getPublicKey(@PathVariable("username") String username) {
 		return userService.getUserPublicKey(username);
 	}
@@ -50,22 +51,18 @@ public class RESTController {
 		String pw = myMap.get("password");
 		String username = myMap.get("username");
 		
-		// System.out.println("wtf");
 		try {	
 			User user = userService.isValidUser(username, pw);
 		
 			if (user == null)
 				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-			System.out.println("C: wtf");
 
 			String privateKey = AES.decrypt(user.getEncryptedPrivateKey(), AES.getKeyFromPassword(pw, user.getSalt()), new IvParameterSpec(Base64.getDecoder().decode(user.getIV())));
 
 			UserResponse res = new UserResponse(username, privateKey);
 			
-			System.out.println("D: wtf");
-
-			return ResponseEntity.ok(res);
+			return new ResponseEntity<UserResponse>(res, HttpStatus.OK);
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -73,8 +70,8 @@ public class RESTController {
 	}
 	
 	@CrossOrigin
-	@PostMapping("/register")
-	public String register(@RequestBody String requestData) {
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	public ResponseEntity<?> register(@RequestBody String requestData) {
 		Map<String, String> myMap = JSONAdapter.deserialize(requestData);
 		String username = myMap.get("username");
 		String password = myMap.get("password");
@@ -89,14 +86,12 @@ public class RESTController {
 			String encryptedDummy = AES.encrypt("dummy dummy dummy", aesKey, aesIv);
 			String aesIVString = Base64.getEncoder().encodeToString(aesIv.getIV());
 			User user = new User(username, encryptedDummy, keyPair.getValue(), encryptedPrivateKey, salt, aesIVString);
-			
-			System.out.println(username + '\n' + encryptedDummy + '\n' + keyPair.getValue() + '\n' + encryptedPrivateKey + '\n' + salt + '\n' + aesIVString);
 			userService.addUser(user);
 			
-			return "register success";
+			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "register failed";
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
