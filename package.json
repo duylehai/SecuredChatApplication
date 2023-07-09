@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "@types/stompjs": "^2.3.5",
+    "aes-js": "^3.1.2",
+    "axios": "^1.4.0",
+    "crypto-js": "^4.1.1",
+    "js-crypto-rsa": "^1.0.4",
+    "nextjs-websocket": "^1.0.11",
+    "react-stomp": "^5.1.0",
+    "react-use-websocket": "^4.3.1",
+    "socket.io": "^4.7.1",
+    "socket.io-client": "^4.7.1",
+    "sockjs-client": "^1.6.1",
+    "websocket": "^1.0.34",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
+    "@types/ws": "^8.5.5"
+  }
+}
