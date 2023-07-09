@@ -35,6 +35,10 @@ import { RegisterDialog } from './RegisterDialog';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
 
+import axios from 'axios';
+import { randomBytes } from 'crypto';
+import crypto from 'crypto-js';
+
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
@@ -69,6 +73,26 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const sendMessage = async (receiver: string, message: string) => {
+    if (selectedConversation) {
+      try {
+        const response = await axios.get(
+          `http://10.0.22.60:8080/public-key/${selectedConversation.name}`,
+        );
+
+        const publicKey = response.data;
+
+        const secretKey = randomBytes(64).toString('hex');
+
+        console.log(publicKey);
+        console.log(secretKey);
+        const encryptedMessage = crypto.AES.encrypt(message, secretKey);
+      } catch (err) {
+        return;
+      }
+    }
+  };
 
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
@@ -125,66 +149,77 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         };
         if (!response.ok) {
           // homeDispatch({ field: 'loading', value: false });
-          homeDispatch({ field: 'messageIsStreaming', value: false });
+          // homeDispatch({ field: 'messageIsStreaming', value: false });
           toast.error(response.statusText);
           return;
         }
         const data = response.body;
         if (!data) {
           // homeDispatch({ field: 'loading', value: false });
-          homeDispatch({ field: 'messageIsStreaming', value: false });
+          // homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
         // if (!plugin) {
         // Upon connecting to another user to send message or something
         if (updatedConversation.messages.length === 1) {
-          alert('Test');
           const { content } = message;
           const customName =
             content.length > 30 ? content.substring(0, 30) + '...' : content;
+
           updatedConversation = {
             ...updatedConversation,
             name: customName,
           };
+
+          try {
+            const response = await axios.get(
+              `http://10.0.22.60:8080/public-key/${customName}`,
+            );
+          } catch (err) {
+            console.log(err);
+            return;
+          }
+        } else {
+          sendMessage(selectedConversation.name, message.content);
         }
-        // homeDispatch({ field: 'loading', value: false });
 
         // something should be handled upon receiving messages, don't know how yet.
-        if (Math.floor(Math.random() * 3) == 1) {
-          let text = '';
-          const value = data;
-          const chunkValue = value;
-          text += chunkValue;
+        // if (Math.floor(Math.random() * 3) == 1) {
+        //   let text = '';
+        //   const value = data;
+        //   const chunkValue = value;
+        //   text += chunkValue;
 
-          const updatedMessages: Message[] = [
-            ...updatedConversation.messages,
-            { role: 'assistant', content: chunkValue },
-          ];
-          updatedConversation = {
-            ...updatedConversation,
-            messages: updatedMessages,
-          };
-          homeDispatch({
-            field: 'selectedConversation',
-            value: updatedConversation,
-          });
+        //   const updatedMessages: Message[] = [
+        //     ...updatedConversation.messages,
+        //     { role: 'assistant', content: chunkValue },
+        //   ];
+        //   updatedConversation = {
+        //     ...updatedConversation,
+        //     messages: updatedMessages,
+        //   };
+        // }
 
-          saveConversation(updatedConversation);
-          const updatedConversations: Conversation[] = conversations.map(
-            (conversation) => {
-              if (conversation.id === selectedConversation.id) {
-                return updatedConversation;
-              }
-              return conversation;
-            },
-          );
-          if (updatedConversations.length === 0) {
-            updatedConversations.push(updatedConversation);
-          }
-          homeDispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(updatedConversations);
-          homeDispatch({ field: 'messageIsStreaming', value: false });
+        homeDispatch({
+          field: 'selectedConversation',
+          value: updatedConversation,
+        });
+
+        saveConversation(updatedConversation);
+        const updatedConversations: Conversation[] = conversations.map(
+          (conversation) => {
+            if (conversation.id === selectedConversation.id) {
+              return updatedConversation;
+            }
+            return conversation;
+          },
+        );
+        if (updatedConversations.length === 0) {
+          updatedConversations.push(updatedConversation);
         }
+        homeDispatch({ field: 'conversations', value: updatedConversations });
+        saveConversations(updatedConversations);
+        // homeDispatch({ field: 'messageIsStreaming', value: false });
       }
     },
     [

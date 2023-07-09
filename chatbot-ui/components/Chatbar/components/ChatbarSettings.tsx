@@ -35,6 +35,12 @@ export const ChatbarSettings = () => {
     dispatch: homeDispatch,
   } = useContext(HomeContext);
 
+  const handleLogout = () => {
+    localStorage.clear();
+    homeDispatch({ field: 'loggedIn', value: false });
+    handleClearConversations();
+  };
+
   const {
     handleClearConversations,
     handleImportConversations,
@@ -66,10 +72,7 @@ export const ChatbarSettings = () => {
         <SidebarButton
           text={t('Logout')}
           icon={<IconLogout size={18} />}
-          onClick={() => {
-            homeDispatch({ field: 'loggedIn', value: false });
-            handleClearConversations();
-          }}
+          onClick={handleLogout}
         />
       )}
 

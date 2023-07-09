@@ -325,7 +325,11 @@ export const ChatInput = ({
                   : 'hidden'
               }`,
             }}
-            placeholder={t('Type a message') || ''}
+            placeholder={
+              (selectedConversation && selectedConversation.messages.length > 0
+                ? t('Type a message')
+                : t(`Type a recipient's name`)) || ''
+            }
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}

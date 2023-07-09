@@ -2,10 +2,30 @@ import { useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
 
+import { useFetch } from '@/hooks/useFetch';
+
+import axios from 'axios';
+import { url } from 'inspector';
+
 export const RegisterDialog = () => {
   const { t } = useTranslation('chat');
 
   const [error, setError] = useState<string | null>(null);
+
+  const [username, setUsername] = useState<string | null>(null);
+  const [password, setPassword] = useState<string | null>(null);
+
+  const handleRegister = async () => {
+    const response = await axios.post('http://10.0.22.60:8080/register', {
+      username: username,
+      password: password,
+    });
+
+    const txt = response.data;
+    console.log(txt);
+
+    setError(txt);
+  };
 
   return (
     <>
@@ -19,8 +39,12 @@ export const RegisterDialog = () => {
             <div className="flex flex-col">
               <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
                 <input
+                  type="text"
                   className="w-full bg-transparent p-2"
                   placeholder="Username"
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                  }}
                 ></input>
               </div>
             </div>
@@ -28,20 +52,25 @@ export const RegisterDialog = () => {
             <div className="flex flex-col">
               <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
                 <input
+                  type="password"
                   className="w-full bg-transparent p-2"
                   placeholder="Password"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
                 ></input>
               </div>
             </div>
 
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <div className="w-full rounded-lg border border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white">
                 <input
+                  type="password"
                   className="w-full bg-transparent p-2"
                   placeholder="Confirm password"
                 ></input>
               </div>
-            </div>
+            </div> */}
 
             {error && <div className="flex flex-col pt-2">{error}</div>}
 
@@ -50,9 +79,7 @@ export const RegisterDialog = () => {
                 <button
                   type="button"
                   className="w-full px-4 mt-8 py-2 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
-                  onClick={() => {
-                    setError('Register failed. Please try again');
-                  }}
+                  onClick={handleRegister}
                 >
                   {t('Register')}
                 </button>

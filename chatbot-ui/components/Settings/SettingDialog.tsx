@@ -11,6 +11,7 @@ import { Settings } from '@/types/settings';
 
 import HomeContext from '@/pages/api/home/home.context';
 
+import axios from 'axios';
 import { ChatCompletionResponseMessageRoleEnum } from 'openai';
 
 interface Props {
@@ -55,25 +56,35 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   //   saveSettings(state);
   // };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log('Test');
     console.log(username);
     console.log(password);
 
-    let response = false;
+    try {
+      let response = await axios.post('http://10.0.22.60:8080/login', {
+        username: username,
+        password: password,
+      });
 
-    if (username && username === 'kaihr') {
-      response = true;
-    }
+      console.log(response);
 
-    if (!response) {
-      setError('Wrong username/password. Please try again');
+      localStorage.setItem('username', response.data['username']);
+      localStorage.setItem('private_key', response.data['private_key']);
+
+      homeDispatch({ field: 'loggedIn', value: true });
+
+      setError(null);
+      onClose();
+    } catch (error) {
+      console.log();
+      setError('Login failed. Please try again');
       return;
     }
 
-    homeDispatch({ field: 'loggedIn', value: true });
-    setError(null);
-    onClose();
+    // homeDispatch({ field: 'loggedIn', value: true });
+    // localStorage.setItem('privateKey', response.data['private key']);
+    // localStorage.setItem('username', username as string);
   };
 
   // Render nothing if the dialog is not open.
