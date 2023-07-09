@@ -1,4 +1,5 @@
-import { FC, useContext, useEffect, useReducer, useRef } from 'react';
+import { FC, useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useTranslation } from 'next-i18next';
 
@@ -9,6 +10,9 @@ import { getSettings, saveSettings } from '@/utils/app/settings';
 import { Settings } from '@/types/settings';
 
 import HomeContext from '@/pages/api/home/home.context';
+
+import axios from 'axios';
+import { ChatCompletionResponseMessageRoleEnum } from 'openai';
 
 interface Props {
   open: boolean;
@@ -23,6 +27,10 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   });
   const { dispatch: homeDispatch } = useContext(HomeContext);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const [username, setUsername] = useState<string | null>(null);
+  const [password, setPassword] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
@@ -43,9 +51,40 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
     };
   }, [onClose]);
 
-  const handleSave = () => {
-    homeDispatch({ field: 'lightMode', value: state.theme });
-    saveSettings(state);
+  // const handleSave = () => {
+  //   homeDispatch({ field: 'lightMode', value: state.theme });
+  //   saveSettings(state);
+  // };
+
+  const handleLogin = async () => {
+    console.log('Test');
+    console.log(username);
+    console.log(password);
+
+    try {
+      let response = await axios.post('http://10.0.22.60:8080/login', {
+        username: username,
+        password: password,
+      });
+
+      console.log(response);
+
+      localStorage.setItem('username', response.data['username']);
+      localStorage.setItem('private_key', response.data['private_key']);
+
+      homeDispatch({ field: 'loggedIn', value: true });
+
+      setError(null);
+      onClose();
+    } catch (error) {
+      console.log();
+      setError('Login failed. Please try again');
+      return;
+    }
+
+    // homeDispatch({ field: 'loggedIn', value: true });
+    // localStorage.setItem('privateKey', response.data['private key']);
+    // localStorage.setItem('username', username as string);
   };
 
   // Render nothing if the dialog is not open.
@@ -69,10 +108,10 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
             role="dialog"
           >
             <div className="text-lg pb-4 font-bold text-black dark:text-neutral-200">
-              {t('Settings')}
+              {t('Login')}
             </div>
 
-            <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
+            {/* <div className="text-sm font-bold mb-2 text-black dark:text-neutral-200">
               {t('Theme')}
             </div>
 
@@ -85,17 +124,36 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
             >
               <option value="dark">{t('Dark mode')}</option>
               <option value="light">{t('Light mode')}</option>
-            </select>
+            </select> */}
+
+            <input
+              className="w-full my-4 cursor-pointer border rounded bg-transparent p-2 text-neutral-700 dark:text-neutral-200 border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white"
+              placeholder="Username"
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+              type="text"
+            ></input>
+
+            <input
+              className="w-full cursor-pointer border rounded bg-transparent p-2 text-neutral-700 dark:text-neutral-200 border-neutral-200 bg-transparent pr-2 text-neutral-900 dark:border-neutral-600 dark:text-white"
+              placeholder="Password"
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+              type="password"
+            ></input>
+
+            {error && <div className="pt-4 w-full">{error}</div>}
 
             <button
-              type="button"
-              className="w-full px-4 py-2 mt-6 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
+              type="submit"
+              className="w-full px-4 py-2 mt-10 border rounded-lg shadow border-neutral-500 text-neutral-900 hover:bg-neutral-100 focus:outline-none dark:border-neutral-800 dark:border-opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-300"
               onClick={() => {
-                handleSave();
-                onClose();
+                handleLogin();
               }}
             >
-              {t('Save')}
+              {t('Login')}
             </button>
           </div>
         </div>
