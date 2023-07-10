@@ -76,9 +76,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
   const sendMessage = async (receiver: string, message: string) => {
     if (selectedConversation) {
+      const socket = new WebSocket('ws://localhost:8000/chat')
+      socket.onopen = () => {
+        console.log('Kết nối WebSocket đã được thiết lập.');
+      };
+      
       try {
+        console.log("wtf")
         const response = await axios.get(
-          `http://10.0.22.60:8080/public-key/${selectedConversation.name}`,
+          `/public-key/${selectedConversation.name}`,
         );
 
         const publicKey = response.data;
@@ -172,8 +178,13 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           };
 
           try {
+            console.log("wtf 123")
+            const socket = new WebSocket('ws://localhost:8000/chat')
+            socket.onopen = () => {
+              console.log('Kết nối WebSocket đã được thiết lập.');
+            };
             const response = await axios.get(
-              `http://10.0.22.60:8080/public-key/${customName}`,
+              `/public-key/${customName}`,
             );
           } catch (err) {
             console.log(err);
