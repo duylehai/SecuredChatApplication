@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
+    "@stomp/stompjs": "^7.0.0",
     "@tabler/icons-react": "^2.9.0",
+    "@types/sockjs-client": "^1.5.1",
     "eventsource-parser": "^0.1.0",
     "i18next": "^22.4.13",
     "next": "13.2.4",
@@ -26,11 +28,15 @@
     "react-markdown": "^8.0.5",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.14.1",
+    "react-stomp": "^5.1.0",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "uuid": "^9.0.0"
+    "sockjs": "^0.3.24",
+    "sockjs-client": "^1.6.1",
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.4.4",

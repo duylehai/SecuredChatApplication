@@ -62,7 +62,7 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
     console.log(password);
 
     try {
-      let response = await axios.post('http://10.0.22.60:8080/login', {
+      let response = await axios.post('/login', {
         username: username,
         password: password,
       });

@@ -16,7 +16,7 @@ export const RegisterDialog = () => {
   const [password, setPassword] = useState<string | null>(null);
 
   const handleRegister = async () => {
-    const response = await axios.post('http://10.0.22.60:8080/register', {
+    const response = await axios.post('/register', {
       username: username,
       password: password,
     });

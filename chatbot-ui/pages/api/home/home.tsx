@@ -39,6 +39,7 @@ import Promptbar from '@/components/Promptbar';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
+import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -46,6 +47,8 @@ interface Props {
   serverSidePluginKeysSet: boolean;
   defaultModelId: OpenAIModelID;
 }
+
+axios.defaults.baseURL = 'http://localhost:8080';
 
 const Home = ({
   serverSideApiKeyIsSet,
@@ -74,7 +77,9 @@ const Home = ({
     dispatch,
   } = contextValue;
 
-  console.log(dispatch);
+  const socketRef = useRef();
+
+  //  console.log(dispatch);
 
   const stopConversationRef = useRef<boolean>(false);
 

@@ -52,5 +52,5 @@ export const initialState: HomeInitialState = {
   defaultModelId: undefined,
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
-  loggedIn: true,
+  loggedIn: false,
 };
