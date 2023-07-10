@@ -41,9 +41,10 @@ import crypto from 'crypto-js';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
+  onSocketSend: any;
 }
 
-export const Chat = memo(({ stopConversationRef }: Props) => {
+export const Chat = memo(({ stopConversationRef, onSocketSend }: Props) => {
   const { t } = useTranslation('chat');
 
   const {
@@ -78,16 +79,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     if (selectedConversation) {
       try {
         const response = await axios.get(
-          `http://10.0.22.60:8080/public-key/${selectedConversation.name}`,
+          `/public-key/${selectedConversation.name}`,
         );
 
-        const publicKey = response.data;
+        // const publicKey = response.data;
+        // const secretKey = randomBytes(64).toString('hex');
 
-        const secretKey = randomBytes(64).toString('hex');
+        // console.log(publicKey);
+        // console.log(secretKey);
+        // const encryptedMessage = crypto.AES.encrypt(message, secretKey);
 
-        console.log(publicKey);
-        console.log(secretKey);
-        const encryptedMessage = crypto.AES.encrypt(message, secretKey);
+        console.log(message);
+        onSocketSend({ message: message, recipient: receiver });
       } catch (err) {
         return;
       }
@@ -172,12 +175,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           };
 
           try {
-            const response = await axios.get(
-              `http://10.0.22.60:8080/public-key/${customName}`,
-            );
+            const response = await axios.get(`/public-key/${customName}`);
+            console.log('OK');
           } catch (err) {
+            updatedConversation = {
+              ...selectedConversation,
+              messages: [],
+              name: 'User not found. Please try again',
+            };
             console.log(err);
-            return;
           }
         } else {
           sendMessage(selectedConversation.name, message.content);
