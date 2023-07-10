@@ -78,7 +78,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
     if (selectedConversation) {
       try {
         const response = await axios.get(
-          `http://10.0.22.60:8080/public-key/${selectedConversation.name}`,
+          `public-key/${selectedConversation.name}`,
         );
 
         const publicKey = response.data;
@@ -172,12 +172,15 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           };
 
           try {
-            const response = await axios.get(
-              `http://10.0.22.60:8080/public-key/${customName}`,
-            );
+            const response = await axios.get(`public-key/${customName}`);
+            console.log('OK');
           } catch (err) {
             console.log(err);
-            return;
+            updatedConversation = {
+              ...updatedConversation,
+              messages: [],
+              name: 'User not found. Try again',
+            };
           }
         } else {
           sendMessage(selectedConversation.name, message.content);
