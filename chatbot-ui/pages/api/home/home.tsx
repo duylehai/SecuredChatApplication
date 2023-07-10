@@ -135,20 +135,19 @@ const Home = ({
       //}
     } else {
       console.log('Not existed yet, add a new one');
-      const lastConversation = conversations[conversations.length - 1];
 
       const newConversation: Conversation = {
         id: uuidv4(),
         name: data.sender,
         messages: [{ role: 'assistant', content: data.message }],
-        model: lastConversation?.model || {
+        model: {
           id: OpenAIModels[defaultModelId].id,
           name: OpenAIModels[defaultModelId].name,
           maxLength: OpenAIModels[defaultModelId].maxLength,
           tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
         },
         prompt: DEFAULT_SYSTEM_PROMPT,
-        temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+        temperature: DEFAULT_TEMPERATURE,
         folderId: null,
       };
 
@@ -174,13 +173,17 @@ const Home = ({
       newSocket.onopen = (e) => {
         console.log('very socket');
       };
+    }
+  }, [loggedIn]);
 
+  useEffect(() => {
+    if (newSocket) {
       newSocket.onmessage = (e) => {
         setFuckingDummy((v) => v + 2);
         handleReceiveMessage(e);
       };
     }
-  }, [loggedIn, fuckingDummy]);
+  }, [conversations, selectedConversation]);
 
   const handleSocketSend = (message: any) => {
     console.log(message);
