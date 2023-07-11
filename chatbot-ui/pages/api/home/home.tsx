@@ -89,17 +89,19 @@ const Home = ({
 
     const data = JSON.parse(e.data);
 
-    const tmp = conversations.find((conv) => {
-      console.log(conv.name);
-      console.log(data.sender);
-      return conv.name === data.sender;
-    });
+    const tmp = conversations
+      ? conversations.find((conv) => {
+          console.log(conv.name);
+          console.log(data.sender);
+          return conv.name === data.sender;
+        })
+      : undefined;
 
     if (tmp !== undefined) {
       //if (selectedConversation) {
       let updatedSelectedConversation = { ...selectedConversation };
 
-      if (selectedConversation.name == data.sender) {
+      if (selectedConversation && selectedConversation.name == data.sender) {
         updatedSelectedConversation = {
           ...selectedConversation,
           messages: [
@@ -110,21 +112,22 @@ const Home = ({
       }
 
       const updatedConversations = conversations.map((conv) => {
-        if (conv.id === selectedConversation.id) return selectedConversation;
-        else {
-          let updatedConv = { ...conv };
-          if (conv.name === data.sender) {
-            updatedConv = {
-              ...conv,
-              messages: [
-                ...conv.messages,
-                { role: 'assistant', content: data.message },
-              ],
-            };
-          }
-
-          return updatedConv;
+        // if (selectedConversation && conv.id === selectedConversation.id)
+        //   return selectedConversation;
+        // else {
+        let updatedConv = { ...conv };
+        if (conv.name === data.sender) {
+          updatedConv = {
+            ...conv,
+            messages: [
+              ...conv.messages,
+              { role: 'assistant', content: data.message },
+            ],
+          };
         }
+
+        return updatedConv;
+        // }
       });
 
       dispatch({ field: 'conversations', value: updatedConversations });
@@ -183,7 +186,7 @@ const Home = ({
         handleReceiveMessage(e);
       };
     }
-  }, [conversations, selectedConversation]);
+  }, [conversations, selectedConversation, loggedIn]);
 
   const handleSocketSend = (message: any) => {
     console.log(message);
