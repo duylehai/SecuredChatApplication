@@ -40,8 +40,7 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import axios from 'axios';
-import io from 'socket.io-client';
-import SockJS from 'sockjs-client';
+import forge from 'node-forge';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -84,15 +83,37 @@ const Home = ({
 
   const [fuckingDummy, setFuckingDummy] = useState<number>(0);
 
-  const handleReceiveMessage = (e) => {
+  const handleReceiveMessage = (e: any) => {
     console.log(fuckingDummy);
 
     const data = JSON.parse(e.data);
 
+    const encryptedMessage = forge.util.createBuffer(
+      forge.util.decode64(data.encrypted_message),
+    );
+
+    const privateKey = forge.pki.privateKeyFromPem(
+      localStorage.getItem('private_key') as string,
+    );
+
+    const encryptedAesKey = JSON.parse(
+      privateKey.decrypt(data.encrypted_aes_key, 'RSA-OAEP', {
+        md: forge.md.sha256.create(),
+      }),
+    );
+
+    const aesKey = forge.util.decode64(encryptedAesKey.aesKey);
+    const iv = forge.util.decode64(encryptedAesKey.iv);
+
+    var decipher = forge.cipher.createDecipher('AES-CBC', aesKey);
+    decipher.start({ iv: iv });
+    decipher.update(encryptedMessage);
+    decipher.finish();
+
+    var plain = forge.util.decodeUtf8(decipher.output.data);
+
     const tmp = conversations
       ? conversations.find((conv) => {
-          console.log(conv.name);
-          console.log(data.sender);
           return conv.name === data.sender;
         })
       : undefined;
@@ -106,7 +127,7 @@ const Home = ({
           ...selectedConversation,
           messages: [
             ...selectedConversation.messages,
-            { role: 'assistant', content: data.message },
+            { role: 'assistant', content: plain },
           ],
         };
       }
@@ -119,10 +140,7 @@ const Home = ({
         if (conv.name === data.sender) {
           updatedConv = {
             ...conv,
-            messages: [
-              ...conv.messages,
-              { role: 'assistant', content: data.message },
-            ],
+            messages: [...conv.messages, { role: 'assistant', content: plain }],
           };
         }
 
@@ -142,7 +160,7 @@ const Home = ({
       const newConversation: Conversation = {
         id: uuidv4(),
         name: data.sender,
-        messages: [{ role: 'assistant', content: data.message }],
+        messages: [{ role: 'assistant', content: plain }],
         model: {
           id: OpenAIModels[defaultModelId].id,
           name: OpenAIModels[defaultModelId].name,
@@ -189,8 +207,6 @@ const Home = ({
   }, [conversations, selectedConversation, loggedIn]);
 
   const handleSocketSend = (message: any) => {
-    console.log(message);
-
     if (newSocket !== null) newSocket.send(JSON.stringify(message));
   };
 

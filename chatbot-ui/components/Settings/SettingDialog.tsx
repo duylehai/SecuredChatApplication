@@ -57,17 +57,11 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
   // };
 
   const handleLogin = async () => {
-    console.log('Test');
-    console.log(username);
-    console.log(password);
-
     try {
       let response = await axios.post('/login', {
         username: username,
         password: password,
       });
-
-      console.log(response);
 
       localStorage.setItem('username', response.data['username']);
       localStorage.setItem('private_key', response.data['private_key']);
