@@ -33,6 +33,8 @@ class Register(APIView):
 
 class Login(APIView):
     def post(self, request, *args, **kwargs):
+        if not User.objects.filter(username=request.data["username"]).exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
         user = User.objects.get(username=request.data["username"])
         key = generate_aes_key(request.data["password"])
         decrypted_dummy = aes_decrypt(key, user.encrypted_dummy)
