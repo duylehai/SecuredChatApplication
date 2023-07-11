@@ -175,7 +175,7 @@ export const Chat = memo(({ stopConversationRef, onSocketSend }: Props) => {
           };
 
           try {
-            const response = await axios.get(`/public-key/${customName}`);
+            const response = await axios.get(`/public-key/${customName}`)
             console.log('OK');
           } catch (err) {
             updatedConversation = {
