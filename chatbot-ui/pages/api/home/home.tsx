@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 
 import { GetServerSideProps } from 'next';
@@ -40,6 +40,8 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import axios from 'axios';
+import io from 'socket.io-client';
+import SockJS from 'sockjs-client';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -48,7 +50,9 @@ interface Props {
   defaultModelId: OpenAIModelID;
 }
 
-axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.baseURL = 'http://localhost:8000/api';
+
+let newSocket: WebSocket | null = null;
 
 const Home = ({
   serverSideApiKeyIsSet,
@@ -73,11 +77,125 @@ const Home = ({
       selectedConversation,
       prompts,
       temperature,
+      loggedIn,
     },
     dispatch,
   } = contextValue;
 
-  const socketRef = useRef();
+  const [fuckingDummy, setFuckingDummy] = useState<number>(0);
+
+  const handleReceiveMessage = (e) => {
+    console.log(fuckingDummy);
+
+    const data = JSON.parse(e.data);
+
+    const tmp = conversations.find((conv) => {
+      console.log(conv.name);
+      console.log(data.sender);
+      return conv.name === data.sender;
+    });
+
+    if (tmp !== undefined) {
+      //if (selectedConversation) {
+      let updatedSelectedConversation = { ...selectedConversation };
+
+      if (selectedConversation.name == data.sender) {
+        updatedSelectedConversation = {
+          ...selectedConversation,
+          messages: [
+            ...selectedConversation.messages,
+            { role: 'assistant', content: data.message },
+          ],
+        };
+      }
+
+      const updatedConversations = conversations.map((conv) => {
+        if (conv.id === selectedConversation.id) return selectedConversation;
+        else {
+          let updatedConv = { ...conv };
+          if (conv.name === data.sender) {
+            updatedConv = {
+              ...conv,
+              messages: [
+                ...conv.messages,
+                { role: 'assistant', content: data.message },
+              ],
+            };
+          }
+
+          return updatedConv;
+        }
+      });
+
+      dispatch({ field: 'conversations', value: updatedConversations });
+      dispatch({
+        field: 'selectedConversation',
+        value: updatedSelectedConversation,
+      });
+      //}
+    } else {
+      console.log('Not existed yet, add a new one');
+
+      const newConversation: Conversation = {
+        id: uuidv4(),
+        name: data.sender,
+        messages: [{ role: 'assistant', content: data.message }],
+        model: {
+          id: OpenAIModels[defaultModelId].id,
+          name: OpenAIModels[defaultModelId].name,
+          maxLength: OpenAIModels[defaultModelId].maxLength,
+          tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
+        },
+        prompt: DEFAULT_SYSTEM_PROMPT,
+        temperature: DEFAULT_TEMPERATURE,
+        folderId: null,
+      };
+
+      const updatedConversations = [...conversations, newConversation];
+
+      dispatch({ field: 'conversations', value: updatedConversations });
+    }
+
+    setFuckingDummy((v) => v + 69);
+  };
+
+  useEffect(() => {
+    // connect to WebSocket server
+    if (loggedIn) {
+      if (newSocket === null) {
+        newSocket = new WebSocket(
+          `ws://localhost:8000/chat?username=${localStorage.getItem(
+            'username',
+          )}`,
+        );
+      }
+
+      newSocket.onopen = (e) => {
+        console.log('very socket');
+      };
+    }
+  }, [loggedIn]);
+
+  useEffect(() => {
+    if (newSocket) {
+      newSocket.onmessage = (e) => {
+        setFuckingDummy((v) => v + 2);
+        handleReceiveMessage(e);
+      };
+    }
+  }, [conversations, selectedConversation]);
+
+  const handleSocketSend = (message: any) => {
+    console.log(message);
+
+    if (newSocket !== null) newSocket.send(JSON.stringify(message));
+  };
+
+  useEffect(() => {
+    if (!loggedIn) {
+      localStorage.clear();
+    }
+  });
 
   //  console.log(dispatch);
 
@@ -389,7 +507,10 @@ const Home = ({
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             <Chatbar />
             <div className="flex flex-1">
-              <Chat stopConversationRef={stopConversationRef} />
+              <Chat
+                stopConversationRef={stopConversationRef}
+                onSocketSend={handleSocketSend}
+              />
             </div>
             {/*<Promptbar />*/}
           </div>
