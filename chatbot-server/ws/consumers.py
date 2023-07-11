@@ -27,12 +27,13 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         json_data = json.loads(text_data)
-        message = json_data['message']
         sender = self.user
+        encrypted_message = json_data['encrypted_message']
+        encrypted_aes_key = json_data['encrypted_aes_key']
         recipient = json_data['recipient']
-        self.send_message(message, sender, recipient)
+        self.send_message(sender, encrypted_message, encrypted_aes_key, recipient)
 
-    def send_message(self, message, sender, recipient):
+    def send_message(self, sender, encrypted_message, encrypted_aes_key, recipient):
         if not User.objects.filter(username=recipient).exists():
             return
         
@@ -41,16 +42,19 @@ class ChatConsumer(WebsocketConsumer):
             group_name,
             {
                 'type': 'chat_message',
-                'message': message,
+                'encrypted_message': encrypted_message,
+                'encrypted_aes_key': encrypted_aes_key,
                 'sender': sender,
             }
         )
 
     def chat_message(self, event):
-        message = event['message']
+        encrypted_message = event['encrypted_message']
+        encrypted_aes_key = event['encrypted_aes_key']
         sender = event['sender']
         self.send(text_data=json.dumps({
-            'message': message,
+            'encrypted_message': encrypted_message,
+            'encrypted_aes_key': encrypted_aes_key,
             'sender': sender,
         }))
 
