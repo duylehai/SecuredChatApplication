@@ -3,7 +3,9 @@ from channels.generic.websocket import WebsocketConsumer
 from api.models import User
 from asgiref.sync import async_to_sync
 from ws.socketAuthentication import socketUser
+from ws.models import Message
 import urllib.parse
+
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -26,8 +28,20 @@ class ChatConsumer(WebsocketConsumer):
             self.channel_name
         )
 
+        messages = Message.objects.filter(recipient=self.user)
+        for message in messages:
+            self.send_message(message.sender, message.encrypted_message, message.encrypted_aes_key, message.recipient)
+            message.delete()
+
     def disconnect(self, close_code):
-        pass
+        if close_code != 1000:
+            return
+        
+        async_to_sync(self.channel_layer.group_discard)(
+            self.group_name,
+            self.channel_name
+        )
+        socketUser.pop(self.user)
 
     def receive(self, text_data):
         json_data = json.loads(text_data)
@@ -38,7 +52,21 @@ class ChatConsumer(WebsocketConsumer):
         self.send_message(sender, encrypted_message, encrypted_aes_key, recipient)
 
     def send_message(self, sender, encrypted_message, encrypted_aes_key, recipient):
+        recipient = str(recipient)
+        sender = str(sender)
+
         if not User.objects.filter(username=recipient).exists():
+            return
+        
+        if recipient not in socketUser:
+            try:
+                sender = User.objects.get(username=sender)
+                recipient = User.objects.get(username=recipient)
+            except:
+                return
+            
+            message = Message(sender=sender, recipient=recipient, encrypted_message=encrypted_message, encrypted_aes_key=encrypted_aes_key)
+            message.save()
             return
         
         group_name = f'chat_{recipient}'
