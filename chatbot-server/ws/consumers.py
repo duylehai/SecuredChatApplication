@@ -2,17 +2,21 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from api.models import User
 from asgiref.sync import async_to_sync
+from ws.socketAuthentication import socketUser
 import urllib.parse
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         params = urllib.parse.parse_qs(self.scope['query_string'])
         
-        if not params[b'username']:
+        if not params[b'username'] or not params[b'socket_code'] :
             self.close()
 
         self.user = params[b'username'][0].decode()
         if not User.objects.filter(username=self.user).exists():
+            self.close()
+        
+        if str(self.user) not in socketUser or str(params[b'socket_code'][0].decode()) != socketUser.get(str(self.user)):
             self.close()
 
         self.accept()

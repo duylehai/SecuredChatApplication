@@ -4,6 +4,9 @@ from rest_framework import status
 from api.serializers import UserSerializer
 from api.crypto_helper import *
 from api.models import DUMMY, User
+from Cryptodome.Random import get_random_bytes
+from ws.socketAuthentication import socketUser
+from base64 import b64encode
 
 class Register(APIView):
     def post(self, request, *args, **kwargs):
@@ -11,12 +14,12 @@ class Register(APIView):
         encrypted_dummy = aes_encrypt(key, DUMMY.encode())
         private_key, public_key = generate_rsa_key_pair()
         encrypted_private_key = aes_encrypt(key, private_key)
-        
+
         user = {
             "username": request.data["username"],
             "encrypted_dummy": encrypted_dummy,
             "public_key": public_key,
-            "encrypted_private_key": encrypted_private_key
+            "encrypted_private_key": encrypted_private_key,
         }
 
         serializer = UserSerializer(data=user)
@@ -33,10 +36,15 @@ class Login(APIView):
         user = User.objects.get(username=request.data["username"])
         key = generate_aes_key(request.data["password"])
         decrypted_dummy = aes_decrypt(key, user.encrypted_dummy)
+        socketCode = b64encode(get_random_bytes(10)).decode('utf-8')
+
+        socketUser[request.data["username"]] = socketCode
+
         if decrypted_dummy.decode() == DUMMY:
             resp = {
                 "username": user.username,
                 "private_key": aes_decrypt(key, user.encrypted_private_key).decode(),
+                "socket_code": socketCode,
             }
             return Response(resp, status=status.HTTP_200_OK)
         else:
