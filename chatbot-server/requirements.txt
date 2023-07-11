@@ -4,4 +4,5 @@ daphne
 channels
 pycryptodomex
 pycrypto
+pycryptodome
 django-cors-headers
