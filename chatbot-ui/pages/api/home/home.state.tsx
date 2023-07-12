@@ -28,7 +28,6 @@ export interface HomeInitialState {
   serverSideApiKeyIsSet: boolean;
   serverSidePluginKeysSet: boolean;
   loggedIn: boolean;
-  socketCode: string | undefined;
 }
 
 export const initialState: HomeInitialState = {
@@ -54,5 +53,4 @@ export const initialState: HomeInitialState = {
   serverSideApiKeyIsSet: false,
   serverSidePluginKeysSet: false,
   loggedIn: false,
-  socketCode: undefined,
 };

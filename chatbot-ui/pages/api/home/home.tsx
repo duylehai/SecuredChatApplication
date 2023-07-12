@@ -40,7 +40,8 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import axios from 'axios';
-import forge from 'node-forge';
+import io from 'socket.io-client';
+import SockJS from 'sockjs-client';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -77,76 +78,53 @@ const Home = ({
       prompts,
       temperature,
       loggedIn,
-      socketCode,
     },
     dispatch,
   } = contextValue;
 
   const [fuckingDummy, setFuckingDummy] = useState<number>(0);
 
-  const handleReceiveMessage = (e: any) => {
+  const handleReceiveMessage = (e) => {
     console.log(fuckingDummy);
 
     const data = JSON.parse(e.data);
 
-    const encryptedMessage = forge.util.createBuffer(
-      forge.util.decode64(data.encrypted_message),
-    );
-
-    const privateKey = forge.pki.privateKeyFromPem(
-      localStorage.getItem('private_key') as string,
-    );
-
-    const encryptedAesKey = JSON.parse(
-      privateKey.decrypt(data.encrypted_aes_key, 'RSA-OAEP', {
-        md: forge.md.sha256.create(),
-      }),
-    );
-
-    const aesKey = forge.util.decode64(encryptedAesKey.aesKey);
-    const iv = forge.util.decode64(encryptedAesKey.iv);
-
-    var decipher = forge.cipher.createDecipher('AES-CBC', aesKey);
-    decipher.start({ iv: iv });
-    decipher.update(encryptedMessage);
-    decipher.finish();
-
-    var plain = forge.util.decodeUtf8(decipher.output.data);
-
-    const tmp = conversations
-      ? conversations.find((conv) => {
-          return conv.name === data.sender;
-        })
-      : undefined;
+    const tmp = conversations.find((conv) => {
+      console.log(conv.name);
+      console.log(data.sender);
+      return conv.name === data.sender;
+    });
 
     if (tmp !== undefined) {
       //if (selectedConversation) {
       let updatedSelectedConversation = { ...selectedConversation };
 
-      if (selectedConversation && selectedConversation.name == data.sender) {
+      if (selectedConversation.name == data.sender) {
         updatedSelectedConversation = {
           ...selectedConversation,
           messages: [
             ...selectedConversation.messages,
-            { role: 'assistant', content: plain },
+            { role: 'assistant', content: data.message },
           ],
         };
       }
 
       const updatedConversations = conversations.map((conv) => {
-        // if (selectedConversation && conv.id === selectedConversation.id)
-        //   return selectedConversation;
-        // else {
-        let updatedConv = { ...conv };
-        if (conv.name === data.sender) {
-          updatedConv = {
-            ...conv,
-            messages: [...conv.messages, { role: 'assistant', content: plain }],
-          };
-        }
+        if (conv.id === selectedConversation.id) return selectedConversation;
+        else {
+          let updatedConv = { ...conv };
+          if (conv.name === data.sender) {
+            updatedConv = {
+              ...conv,
+              messages: [
+                ...conv.messages,
+                { role: 'assistant', content: data.message },
+              ],
+            };
+          }
 
-        return updatedConv;
-        // }
+          return updatedConv;
+        }
       });
 
       dispatch({ field: 'conversations', value: updatedConversations });
@@ -161,7 +139,7 @@ const Home = ({
       const newConversation: Conversation = {
         id: uuidv4(),
         name: data.sender,
-        messages: [{ role: 'assistant', content: plain }],
+        messages: [{ role: 'assistant', content: data.message }],
         model: {
           id: OpenAIModels[defaultModelId].id,
           name: OpenAIModels[defaultModelId].name,
@@ -184,21 +162,19 @@ const Home = ({
   useEffect(() => {
     // connect to WebSocket server
     if (loggedIn) {
-      if (socketCode) {
-        if (newSocket === null) {
-          newSocket = new WebSocket(
-            `ws://localhost:8000/chat?username=${localStorage.getItem(
-              'username',
-            )}&socket_code=${socketCode}`,
-          );
-
-          newSocket.onopen = (e) => {
-            console.log('very socket');
-          };
-        }
+      if (newSocket === null) {
+        newSocket = new WebSocket(
+          `ws://localhost:8000/chat?username=${localStorage.getItem(
+            'username',
+          )}`,
+        );
       }
+
+      newSocket.onopen = (e) => {
+        console.log('very socket');
+      };
     }
-  }, [loggedIn, socketCode]);
+  }, [loggedIn]);
 
   useEffect(() => {
     if (newSocket) {
@@ -207,9 +183,11 @@ const Home = ({
         handleReceiveMessage(e);
       };
     }
-  }, [conversations, selectedConversation, loggedIn]);
+  }, [conversations, selectedConversation]);
 
   const handleSocketSend = (message: any) => {
+    console.log(message);
+
     if (newSocket !== null) newSocket.send(JSON.stringify(message));
   };
 
