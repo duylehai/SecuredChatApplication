@@ -37,7 +37,7 @@ import { TemperatureSlider } from './Temperature';
 
 import axios from 'axios';
 import { randomBytes } from 'crypto';
-import crypto from 'crypto-js';
+import forge from 'node-forge';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -82,15 +82,33 @@ export const Chat = memo(({ stopConversationRef, onSocketSend }: Props) => {
           `/public-key/${selectedConversation.name}`,
         );
 
-        // const publicKey = response.data;
-        // const secretKey = randomBytes(64).toString('hex');
+        const publicKey = forge.pki.publicKeyFromPem(
+          response.data['public_key'],
+        );
 
-        // console.log(publicKey);
-        // console.log(secretKey);
-        // const encryptedMessage = crypto.AES.encrypt(message, secretKey);
+        const aesKey: string = forge.random.getBytesSync(16);
+        const iv: string = forge.random.getBytesSync(16);
 
-        console.log(message);
-        onSocketSend({ message: message, recipient: receiver });
+        var cipher = forge.cipher.createCipher('AES-CBC', aesKey);
+        cipher.start({ iv: iv });
+        cipher.update(forge.util.createBuffer(forge.util.encodeUtf8(message)));
+        cipher.finish();
+
+        const encryptedMessage = forge.util.encode64(cipher.output.data);
+        const encryptedAesKey = publicKey.encrypt(
+          JSON.stringify({
+            aesKey: forge.util.encode64(aesKey),
+            iv: forge.util.encode64(iv),
+          }),
+          'RSA-OAEP',
+          { md: forge.md.sha256.create() },
+        );
+
+        onSocketSend({
+          encrypted_message: encryptedMessage,
+          encrypted_aes_key: encryptedAesKey,
+          recipient: receiver,
+        });
       } catch (err) {
         return;
       }
@@ -175,7 +193,7 @@ export const Chat = memo(({ stopConversationRef, onSocketSend }: Props) => {
           };
 
           try {
-            const response = await axios.get(`/public-key/${customName}`)
+            const response = await axios.get(`/public-key/${customName}`);
             console.log('OK');
           } catch (err) {
             updatedConversation = {
