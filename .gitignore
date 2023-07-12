@@ -168,3 +168,7 @@ dist
 .pnp.*
 
 src/main/resources/*
+*.pyc
+*.sqlite3
+chatbot-server/api/__pycache__/__init__.cpython-39.pyc
+*.sqlite3
