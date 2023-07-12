@@ -67,6 +67,10 @@ export const SettingDialog: FC<Props> = ({ open, onClose }) => {
       localStorage.setItem('private_key', response.data['private_key']);
 
       homeDispatch({ field: 'loggedIn', value: true });
+      homeDispatch({
+        field: 'socketCode',
+        value: response.data['socket_code'],
+      });
 
       setError(null);
       onClose();

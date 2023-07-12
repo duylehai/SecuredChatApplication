@@ -77,6 +77,7 @@ const Home = ({
       prompts,
       temperature,
       loggedIn,
+      socketCode,
     },
     dispatch,
   } = contextValue;
@@ -183,19 +184,21 @@ const Home = ({
   useEffect(() => {
     // connect to WebSocket server
     if (loggedIn) {
-      if (newSocket === null) {
-        newSocket = new WebSocket(
-          `ws://localhost:8000/chat?username=${localStorage.getItem(
-            'username',
-          )}`,
-        );
-      }
+      if (socketCode) {
+        if (newSocket === null) {
+          newSocket = new WebSocket(
+            `ws://localhost:8000/chat?username=${localStorage.getItem(
+              'username',
+            )}&socket_code=${socketCode}`,
+          );
 
-      newSocket.onopen = (e) => {
-        console.log('very socket');
-      };
+          newSocket.onopen = (e) => {
+            console.log('very socket');
+          };
+        }
+      }
     }
-  }, [loggedIn]);
+  }, [loggedIn, socketCode]);
 
   useEffect(() => {
     if (newSocket) {
