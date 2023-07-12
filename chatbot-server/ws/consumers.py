@@ -2,7 +2,11 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from api.models import User
 from asgiref.sync import async_to_sync
+<<<<<<< HEAD
 from ws.socketAuthentication import socketUser
+=======
+from ws.socket_authentication import socket_user
+>>>>>>> 3fcc73d9b94b72bd69cbd77df95231cdf9364050
 from ws.models import Message
 import urllib.parse
 
@@ -18,10 +22,17 @@ class ChatConsumer(WebsocketConsumer):
         if not User.objects.filter(username=self.user).exists():
             self.close()
         
+<<<<<<< HEAD
         if str(self.user) not in socketUser or str(params[b'socket_code'][0].decode()) != socketUser.get(str(self.user)):
             self.close()
             
         socketUser.pop(str(self.user)) 
+=======
+        if str(self.user) not in socket_user or str(params[b'socket_code'][0].decode()) != socket_user.get(str(self.user)):
+            self.close()
+            
+        socket_user.pop(str(self.user)) 
+>>>>>>> 3fcc73d9b94b72bd69cbd77df95231cdf9364050
 
         self.accept()
         self.group_name = f'chat_{self.user}'
@@ -59,7 +70,11 @@ class ChatConsumer(WebsocketConsumer):
         if not User.objects.filter(username=recipient).exists():
             return
         
+<<<<<<< HEAD
         if recipient not in socketUser:
+=======
+        if not f'chat_{recipient}' in self.channel_layer.groups:
+>>>>>>> 3fcc73d9b94b72bd69cbd77df95231cdf9364050
             try:
                 sender = User.objects.get(username=sender)
                 recipient = User.objects.get(username=recipient)
