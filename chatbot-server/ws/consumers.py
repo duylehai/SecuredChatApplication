@@ -21,7 +21,7 @@ class ChatConsumer(WebsocketConsumer):
         if str(self.user) not in socketUser or str(params[b'socket_code'][0].decode()) != socketUser.get(str(self.user)):
             self.close()
             
-        socketUser.pop(str(self.user))
+        socketUser.pop(str(self.user)) 
 
         self.accept()
         self.group_name = f'chat_{self.user}'
