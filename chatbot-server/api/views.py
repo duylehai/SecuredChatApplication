@@ -5,7 +5,7 @@ from api.serializers import UserSerializer
 from api.crypto_helper import *
 from api.models import DUMMY, User
 from Cryptodome.Random import get_random_bytes
-from ws.socket_authentication import socket_user
+from ws.socketAuthentication import socketUser
 from base64 import b64encode
 
 class Register(APIView):
@@ -40,7 +40,7 @@ class Login(APIView):
         decrypted_dummy = aes_decrypt(key, user.encrypted_dummy)
         socketCode = b64encode(get_random_bytes(10)).decode('utf-8')
 
-        socket_user[request.data["username"]] = socketCode
+        socketUser[request.data["username"]] = socketCode
 
         if decrypted_dummy.decode() == DUMMY:
             resp = {
