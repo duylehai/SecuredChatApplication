@@ -16,15 +16,15 @@ export const RegisterDialog = () => {
   const [password, setPassword] = useState<string | null>(null);
 
   const handleRegister = async () => {
-    const response = await axios.post('/register', {
-      username: username,
-      password: password,
-    });
-
-    const txt = response.data;
-    console.log(txt);
-
-    setError(txt);
+    try {
+      const response = await axios.post('/register', {
+        username: username,
+        password: password,
+      });
+      setError('Register success. Please login');
+    } catch (err) {
+      setError('Register failed. Please try again');
+    }
   };
 
   return (
